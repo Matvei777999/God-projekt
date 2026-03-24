@@ -1,3 +1,5 @@
+from pyexpat.errors import messages
+
 import config
 import logging
 import asyncio
@@ -105,8 +107,29 @@ async def start_call(call):
         db.update_field("users", id, "random", random_number)
         await call.message.answer("Отлично! Мишень стоит тебе надо попасть по ней! Куда будем стрелять?", reply_markup=kb6)
     if call.data == "pvpaleft":
-        db.get_field("users",id, "random")
-
+        r = db.get_field("users",id, "random")
+        if r == 1:
+            await call.message.answer("Ты попал! Враг был с лево")
+        elif r == 2:
+            await call.message.answer("Ты промазал!")
+        elif r == 3:
+            await call.message.answer("Ты промазал!")
+    if call.data == "pvpacenter":
+        r = db.get_field("users",id, "random")
+        if r == 1:
+            await call.message.answer("Ты промазал!")
+        elif r == 2:
+            await call.message.answer("Ты попал! Враг был по центру!")
+        elif r == 3:
+            await call.message.answer("Ты промазал!")
+    if call.data == "pvparight":
+        r = db.get_field("users",id, "random")
+        if r == 1:
+            await call.message.answer("Ты промазал!")
+        elif r == 2:
+            await call.message.answer("Ты промазал!")
+        elif r == 3:
+            await call.message.answer("Ты попал! Враг был с право!")
     #if call.data == "yes": проверка нажатия на кнопку
     #await call.answer("Оповещение сверху")
     #await call.message.answer("Отправка сообщения")
