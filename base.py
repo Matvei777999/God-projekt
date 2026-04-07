@@ -11,6 +11,11 @@ class SQL:
         with self.connection:
             return self.cursor.execute(query, (id,))
 
+    def del_user(self, id):
+        query = "DELETE FROM users WHERE id = ?"
+        with self.connection:
+            return self.cursor.execute(query, (id,)).fetchone()
+
     # Проверка, есть ли пользователь в БД
     def user_exist(self, id):
         query = "SELECT * FROM users WHERE id = ?"
