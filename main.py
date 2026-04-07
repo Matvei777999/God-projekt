@@ -50,9 +50,9 @@ buttons5 = [
 kb5 = InlineKeyboardMarkup(inline_keyboard=buttons5)
 
 buttons6 = [
-        [InlineKeyboardButton(text="Лево", callback_data="pvpaleft")],
-        [InlineKeyboardButton(text="Центр", callback_data="pvpacenter")],
-        [InlineKeyboardButton(text="Право", callback_data="pvparight")],
+        [InlineKeyboardButton(text="Лево", callback_data="left")],
+        [InlineKeyboardButton(text="Центр", callback_data="center")],
+        [InlineKeyboardButton(text="Право", callback_data="right")],
     ]
 kb6 = InlineKeyboardMarkup(inline_keyboard=buttons6)
 
@@ -62,34 +62,17 @@ buttons7 = [
         [InlineKeyboardButton(text="Магазин", callback_data="magaz")],
     ]
 kb7 = InlineKeyboardMarkup(inline_keyboard=buttons7)
-buttons8 = [
-        [InlineKeyboardButton(text="Лево", callback_data="left")],
-        [InlineKeyboardButton(text="Центр", callback_data="center")],
-        [InlineKeyboardButton(text="Право", callback_data="right")],
-    ]
-kb8 = InlineKeyboardMarkup(inline_keyboard=buttons8)
+
 
 buttons9 = [
         [InlineKeyboardButton(text="Главное меню", callback_data="glavmenu")]
          ]
 kb9 = InlineKeyboardMarkup(inline_keyboard=buttons9)
-buttons10 = [
-        [InlineKeyboardButton(text="Лево", callback_data="dleft")],
-        [InlineKeyboardButton(text="Центр", callback_data="dcenter")],
-        [InlineKeyboardButton(text="Право", callback_data="dright")],
-    ]
-kb10 = InlineKeyboardMarkup(inline_keyboard=buttons10)
 buttons11 = [
         [InlineKeyboardButton(text="Возродится", callback_data="vozr")],
         [InlineKeyboardButton(text="Магазин", callback_data="magaz")]
     ]
 kb11 = InlineKeyboardMarkup(inline_keyboard=buttons11)
-buttons12 = [
-        [InlineKeyboardButton(text="Лево", callback_data="bleft")],
-        [InlineKeyboardButton(text="Центр", callback_data="bcenter")],
-        [InlineKeyboardButton(text="Право", callback_data="bright")],
-    ]
-kb12 = InlineKeyboardMarkup(inline_keyboard=buttons12)
 
 #когда пользователь написал сообщение
 @dp.message()
@@ -101,10 +84,11 @@ async def start(message):
     if status == 0:
         await message.answer(
             "Привет👋 я главный лесник этого леса. Лес восстал! Магия древних деревьев пробудила животных, и теперь они яростно😡 защищают свои земли🏞. Тебе предстоит пробиваться⚔️ через суровый лес, сражаясь с огромными волками, взбешенными медведями. Используй оружие чтобы выжить и добраться до сердца леса, и заполучить спрятанные сокровища💰."
-            "Ты готов оставить информацию о себе?",
-            reply_markup=kb)
-
-    #db.update_field("users", id, "status", 1) #изменяем статус пользователя
+            "Ты готов оставить информацию о себе?",reply_markup=kb)
+    status = db.get_field("users", id, "status")
+    if status >=2:
+         await message.answer("Главное меню:", reply_markup=kb7)
+         #db.update_field("users", id, "status", 1) #изменяем статус пользователя
     #await message.answer("Выбери вариант!", reply_markup=kb2)#отправка сообщения с клавиатурой
     if status == 1:
         name = message.text
@@ -138,220 +122,436 @@ async def start_call(call):
         await call.message.answer("Хороший выбор! Давай приступим!", reply_markup=kb5)
         db.update_field("users", id, "status", 4)
     if call.data == "trenmish":
+        db.update_field("users", id, "status", 2)
         random_number = random.randint(1, 3)
         db.update_field("users", id, "random", random_number)
         await call.message.answer("Отлично! Мишень стоит тебе надо попасть по ней! Куда будем стрелять?", reply_markup=kb6)
-    if call.data == "pvpaleft":
-        r = db.get_field("users",id, "random")
-        if r == 1:
-            await call.message.answer("Ты попал! Враг был с лево")
-            pr = db.get_field("users", id, "power")
-            pr += 1
-            db.update_field("users", id, "power", pr)
+    if call.data in ["left", "center", "right"] and status == 2:
+        r = db.get_field("users", id, "random")
+        if r == random.randint(1, 3):
             power = db.get_field("users", id, "power")
-            await call.message.answer(f"Твоя сила улучшена! Твоя сила: {power}", reply_markup=kb9)
+            power -= 1
+            db.update_field("users", id, "lovkost", power)
+            await call.message.answer(f"Ты попал по мишени!+1 сила! Твоя сила: {power}", reply_markup=kb9)
             return
-        elif r == 2:
+        else:
             await call.message.answer("Ты промазал!", reply_markup=kb9)
-            return
-        elif r == 3:
-            await call.message.answer("Ты промазал!", reply_markup=kb9)
-            return
-    if call.data == "pvpacenter":
-        r = db.get_field("users",id, "random")
-        if r == 1:
-            await call.message.answer("Ты промазал!", reply_markup=kb9)
-            return
-        elif r == 2:
-            await call.message.answer("Ты попал! Враг был по центру!")
-            pr = db.get_field("users", id, "power")
-            pr += 1
-            db.update_field("users", id, "power", pr)
-            power = db.get_field("users", id, "power")
-            await call.message.answer(f"Твоя сила улучшена! Твоя сила: {power}", reply_markup=kb9)
-            return
-        elif r == 3:
-            await call.message.answer("Ты промазал!", reply_markup=kb9)
-            return
-    if call.data == "pvparight":
-        r = db.get_field("users",id, "random")
-        if r == 1:
-            await call.message.answer("Ты промазал!", reply_markup=kb9)
-            return
-        elif r == 2:
-            await call.message.answer("Ты промазал!", reply_markup=kb9)
-            return
-        elif r == 3:
-            await call.message.answer("Ты попал! Враг был с право!")
-            pr = db.get_field("users", id, "power")
-            pr += 1
-            db.update_field("users", id, "power", pr)
-            power = db.get_field("users", id, "power")
-            await call.message.answer(f"Твоя сила улучшена! Твоя сила: {power}", reply_markup=kb9)
             return
     if call.data == "pvpanimals":
+        db.update_field("users", id, "status", 2)
         random_number = random.randint(1, 3)
         db.update_field("users", id, "random", random_number)
-        await call.message.answer("Отлично! животное стоит тебе надо попасть по нему! Куда будем стрелять?", reply_markup=kb6)
-    if call.data == "pvpaleft":
-        r = db.get_field("users",id, "random")
-        if r == 1:
-            await call.message.answer("Ты попал! Враг был с лево")
-            pr = db.get_field("users", id, "power")
-            pr += 1
-            db.update_field("users", id, "power", pr)
+        await call.message.answer("Отлично! животное стоит тебе надо попасть по нему! Куда будем стрелять?", reply_markup=kb9)
+        return
+    if call.data in ["pvpaleft", "pvpacenter", "pvparight"] and status == 2:
+        r = db.get_field("users", id, "random")
+        if r == random.randint(1, 3):
             power = db.get_field("users", id, "power")
-            await call.message.answer(f"Твоя сила улучшена! Твоя сила: {power}", reply_markup=kb9)
+            power -= 1
+            db.update_field("users", id, "lovkost", power)
+            await call.message.answer(f"Ты попал по животному!+1 сила! Твоя сила: {power}", reply_markup=kb9)
             return
-        elif r == 2:
+        else:
             await call.message.answer("Ты промазал!", reply_markup=kb9)
-            return
-        elif r == 3:
-            await call.message.answer("Ты промазал!", reply_markup=kb9)
-            return
-    if call.data == "pvpacenter":
-        r = db.get_field("users",id, "random")
-        if r == 1:
-            await call.message.answer("Ты промазал!", reply_markup=kb9)
-            return
-        elif r == 2:
-            await call.message.answer("Ты попал! Враг был по центру!")
-            pr = db.get_field("users",id, "power")
-            pr+=1
-            db.update_field("users",id, "power", pr)
-            power = db.get_field("users", id, "power")
-            await call.message.answer(f"Твоя сила улучшена! Твоя сила: {power}", reply_markup=kb9)
-            return
-        elif r == 3:
-            await call.message.answer("Ты промазал!", reply_markup=kb9)
-    if call.data == "pvparight":
-        r = db.get_field("users",id, "random")
-        if r == 1:
-            await call.message.answer("Ты промазал!", reply_markup=kb9)
-            return
-        elif r == 2:
-            await call.message.answer("Ты промазал!", reply_markup=kb9)
-            return
-        elif r == 3:
-            await call.message.answer("Ты попал! Враг был с право! ")
-            pr = db.get_field("users", id, "power")
-            pr += 1
-            db.update_field("users", id, "power", pr)
-            power = db.get_field("users", id, "power")
-            await call.message.answer(f"Твоя сила улучшена! Твоя сила: {power}", reply_markup=kb9)
             return
     if call.data == "yklonpredmet":
         random_number = random.randint(1, 3)
         db.update_field("users", id, "random", random_number)
-        await call.message.answer("Отлично! Противник кинул в тебя булыжник! Куда будешь уклоняться",reply_markup=kb8)
+        await call.message.answer("Отлично! Противник кинул в тебя булыжник! Куда будешь уклоняться",reply_markup=kb6)
+        return
     if call.data in ["left","center","right"] and status==3:
         r = db.get_field("users", id, "random")
         if r == random.randint(1,3):
             lovkost = db.get_field("users", id, "lovkost")
             lovkost -= 1
             db.update_field("users", id, "lovkost", lovkost)
-            await call.message.answer(f"Ты не уклонился от булыжника!-1 ловкость! Твоя ловкость: {lovkost}")
+            await call.message.answer(f"Ты не уклонился от булыжника!-1 ловкость! Твоя ловкость: {lovkost}", reply_markup=kb9)
+            return
         else:
             lovkost = db.get_field("users", id, "lovkost")
             lovkost += 1
             db.update_field("users", id, "lovkost", lovkost)
-            await call.message.answer(f"Ты уклонился от булыжника!-1 ловкость! Твоя ловкость: {lovkost}")
+            await call.message.answer(f"Ты уклонился от булыжника!+1 ловкость! Твоя ловкость: {lovkost}", reply_markup=kb9)
+            return
     if call.data == "bgoblin":
         db.update_field("users", id, "status", 5)
         db.update_field("users", id, "hp_goblin", 50)
         random_number = random.randint(1, 3)
         db.update_field("users", id, "random", random_number)
-        await call.message.answer("Отлично! Твоя задача кидать в противника! Куда будем кидать?", reply_markup=kb10)
-    if call.data in ["dleft","dcenter","dright"] and status==5:
+        await call.message.answer("Отлично! Твоя задача кидать в противника! Куда будем кидать?", reply_markup=kb6)
+    if call.data in ["left","center","right"] and status==5:
         r = db.get_field("users", id, "random")
-        db.update_field("users", id, "status", 6)
         if r == random.randint(1,3):
             await call.message.answer("Ты попал!")
-            d = 10 + random.randint(-3,3)
+            d = 10 + random.randint(5,10)
             hp_goblin = db.get_field("users", id, "hp_goblin")
             yron = hp_goblin - d
             await call.message.answer(f"Вы снесли гоблину {d}хп")
             db.update_field("users", id, "hp_goblin", yron)
-            if hp_goblin <= 0:
-                await call.message.answer("Гоблин был повержен! Ты получаешь +20 к силе, +30 к ловкости, +5 к удаче, +1000 к балансу!", reply_markup=kb9)
-                power = db.get_field("users", id, "power")
-                lovkost = db.get_field("users", id, "lovkost")
-                yudacha = db.get_field("users", id, "yudacha")
-                money = db.get_field("users", id, "money")
-                power +=20
-                lovkost +=30
-                yudacha +=5
-                money +=1000
-                db.update_field("users", id, power, power)
-                db.update_field("users", id, lovkost, lovkost)
-                db.update_field("users", id, yudacha, yudacha)
-                db.update_field("users", id, money, money)
+            await call.message.answer("Теперь твоя задача уклонится от атаки гоблина! Куда будем уклонятся?",reply_markup=kb6)
+            db.update_field("users", id, "status", 6)
+        hp_goblin = db.get_field("users", id, "hp_goblin")
+        if hp_goblin <= 0:
+            await call.message.answer("Гоблин был повержен! Ты получаешь +20 к силе, +30 к ловкости, +5 к удаче, +1000 к балансу!", reply_markup=kb9)
+            power = db.get_field("users", id, "power")
+            lovkost = db.get_field("users", id, "lovkost")
+            yudacha = db.get_field("users", id, "yudacha")
+            money = db.get_field("users", id, "money")
+            power +=20
+            lovkost +=30
+            yudacha +=5
+            money +=1000
+            db.update_field("users", id, power, power)
+            db.update_field("users", id, lovkost, lovkost)
+            db.update_field("users", id, yudacha, yudacha)
+            db.update_field("users", id, money, money)
 
             return
         else:
             await call.message.answer("Ты промазал!")
+            await call.message.answer("Теперь твоя задача уклонится от атаки гоблина! Куда будем уклонятся?",reply_markup=kb6)
+            db.update_field("users", id, "status", 6)
             return
-    if call.data in ["dleft","dcenter","dright"] and status == 6:
-        print('1111')
-        await call.message.answer("Теперь твоя задача уклонится от атаки гоблина! Куда будем уклонятся?",reply_markup=kb12)
+    if call.data in ["left","center","right"] and status == 6:
         r = db.get_field("users", id, "random")
         db.update_field("users", id, "status", 7)
         if r == random.randint(1, 3):
-            d = 10 + random.randint(0, 10)
+            d = 10 + random.randint(10, 20)
             hp = db.get_field("users", id, "hp")
             await call.message.answer(f"Вы не уклонились от атаки гоблина! -{d}")
             yron = hp - d
             db.update_field("users", id, "hp", yron)
-            if hp <= 0:
-
-                await call.message.answer("Вы мертв! Вы можете возродится, но при возрождении все ваши ресурсы и навыки будут потеряны, или можете купить зелье излечения в магазине!", reply_markup=kb11)
+            await call.message.answer("Отлично! Твоя задача кидать в противника! Куда будем кидать?", reply_markup=kb6)
+        hp = db.get_field("users", id, "hp")
+        if hp <= 0:
+            await call.message.answer("Вы мертв! Вы можете возродится, но при возрождении все ваши ресурсы и навыки будут потеряны, или можете купить зелье излечения в магазине!", reply_markup=kb11)
         else:
             await call.message.answer("Вы уклонились от атаки гоблина!")
-    if call.data in ["dleft", "dcenter", "dright"] and status == 7:
+            await call.message.answer("Отлично! Твоя задача кидать в противника! Куда будем кидать?", reply_markup=kb6)
+    if call.data in ["left", "center", "right"] and status == 7:
         r = db.get_field("users", id, "random")
         db.update_field("users", id, "status", 8)
         if r == random.randint(1, 3):
             await call.message.answer("Ты попал!")
-            d = 10 + random.randint(-3, 3)
+            d = 10 + random.randint(10, 17)
             hp_goblin = db.get_field("users", id, "hp_goblin")
             yron = hp_goblin - d
             await call.message.answer(f"Вы снесли гоблину {d}хп")
             db.update_field("users", id, "hp_goblin", yron)
-            if hp_goblin <= 0:
-                await call.message.answer(
-                    "Гоблин был повержен! Ты получаешь +20 к силе, +30 к ловкости, +5 к удаче, +1000 к балансу!",
-                    reply_markup=kb9)
-                power = db.get_field("users", id, "power")
-                lovkost = db.get_field("users", id, "lovkost")
-                yudacha = db.get_field("users", id, "yudacha")
-                money = db.get_field("users", id, "money")
-                power += 20
-                lovkost += 30
-                yudacha += 5
-                money += 1000
-                db.update_field("users", id, power, power)
-                db.update_field("users", id, lovkost, lovkost)
-                db.update_field("users", id, yudacha, yudacha)
-                db.update_field("users", id, money, money)
-
-            return
+            await call.message.answer("Теперь твоя задача уклонится от атаки гоблина! Куда будем уклонятся?",reply_markup=kb6)
+        hp_goblin = db.get_field("users", id, "hp_goblin")
+        if hp_goblin <= 0:
+            await call.message.answer(
+                "Гоблин был повержен! Ты получаешь +20 к силе, +30 к ловкости, +5 к удаче, +1000 к балансу, а так же ваши хп востоновлены!",reply_markup=kb9)
+            power = db.get_field("users", id, "power")
+            lovkost = db.get_field("users", id, "lovkost")
+            yudacha = db.get_field("users", id, "yudacha")
+            money = db.get_field("users", id, "money")
+            hp = db.get_field("users", id, "hp")
+            power += 20
+            lovkost += 30
+            yudacha += 5
+            money += 1000
+            hp +=100
+            db.update_field("users", id, power, power)
+            db.update_field("users", id, lovkost, lovkost)
+            db.update_field("users", id, yudacha, yudacha)
+            db.update_field("users", id, money, money)
         else:
             await call.message.answer("Ты промазал!")
-    if call.data in ["bleft", "bcentr", "bright"] and status == 8:
-        await call.message.answer("Теперь твоя задача уклонится от атаки гоблина! Куда будем уклонятся?",reply_markup=kb12)
+            await call.message.answer("Теперь твоя задача уклонится от атаки гоблина! Куда будем уклонятся?",reply_markup=kb6)
+    if call.data in ["left", "centr", "right"] and status == 8:
         r = db.get_field("users", id, "random")
         db.update_field("users", id, "status", 9)
         if r == random.randint(1, 3):
-            d = 10 + random.randint(0, 10)
+            d = 10 + random.randint(10, 30)
             hp = db.get_field("users", id, "hp")
             await call.message.answer(f"Вы не уклонились от атаки гоблина! -{d}")
             yron = hp - d
             db.update_field("users", id, "hp", yron)
-            if hp <= 0:
-
-                await call.message.answer("Вы мертв! Вы можете возродится, но при возрождении все ваши ресурсы и навыки будут потеряны, или можете купить зелье излечения в магазине!", reply_markup=kb11)
+            await call.message.answer("Отлично! Твоя задача кидать в противника! Куда будем кидать?", reply_markup=kb6)
+        hp = db.get_field("users", id, "hp")
+        if hp <= 0:
+            await call.message.answer("Вы мертв! Вы можете возродится, но при возрождении все ваши ресурсы и навыки будут потеряны, или можете купить зелье излечения в магазине!", reply_markup=kb11)
+            return
         else:
             await call.message.answer("Вы уклонились от атаки гоблина!")
+            await call.message.answer("Отлично! Твоя задача кидать в противника! Куда будем кидать?", reply_markup=kb6)
+            return
+    if call.data in ["left", "center", "right"] and status == 9:
+        r = db.get_field("users", id, "random")
+        db.update_field("users", id, "status", 10)
+        if r == random.randint(1, 3):
+            await call.message.answer("Ты попал!")
+            d = 10 + random.randint(10, 17)
+            hp_goblin = db.get_field("users", id, "hp_goblin")
+            yron = hp_goblin - d
+            await call.message.answer(f"Вы снесли гоблину {d}хп")
+            db.update_field("users", id, "hp_goblin", yron)
+            await call.message.answer("Теперь твоя задача уклонится от атаки гоблина! Куда будем уклонятся?",
+                                      reply_markup=kb6)
+        hp_goblin = db.get_field("users", id, "hp_goblin")
+        if hp_goblin <= 0:
+            await call.message.answer(
+                "Гоблин был повержен! Ты получаешь +20 к силе, +30 к ловкости, +5 к удаче, +1000 к балансу, а так же ваши хп востоновлены!",
+                reply_markup=kb9)
+            power = db.get_field("users", id, "power")
+            lovkost = db.get_field("users", id, "lovkost")
+            yudacha = db.get_field("users", id, "yudacha")
+            money = db.get_field("users", id, "money")
+            hp = db.get_field("users", id, "hp")
+            power += 20
+            lovkost += 30
+            yudacha += 5
+            money += 1000
+            hp += 100
+            db.update_field("users", id, power, power)
+            db.update_field("users", id, lovkost, lovkost)
+            db.update_field("users", id, yudacha, yudacha)
+            db.update_field("users", id, money, money)
+            db.update_field("users", id, hp, hp)
+            return
+        else:
+            await call.message.answer("Ты промазал!")
+            await call.message.answer("Теперь твоя задача уклонится от атаки гоблина! Куда будем уклонятся?",
+                                      reply_markup=kb6)
+            return
+    if call.data in ["left", "centr", "right"] and status == 10:
+        r = db.get_field("users", id, "random")
+        db.update_field("users", id, "status", 11)
+        if r == random.randint(1, 3):
+            d = 10 + random.randint(10, 30)
+            hp = db.get_field("users", id, "hp")
+            await call.message.answer(f"Вы не уклонились от атаки гоблина! -{d}")
+            yron = hp - d
+            db.update_field("users", id, "hp", yron)
+            await call.message.answer("Отлично! Твоя задача кидать в противника! Куда будем кидать?", reply_markup=kb6)
+        hp = db.get_field("users", id, "hp")
+        if hp <= 0:
+            await call.message.answer("Вы мертв! Вы можете возродится, но при возрождении все ваши ресурсы и навыки будут потеряны, или можете купить зелье излечения в магазине!", reply_markup=kb11)
+            return
+        else:
+            await call.message.answer("Вы уклонились от атаки гоблина!")
+            await call.message.answer("Отлично! Твоя задача кидать в противника! Куда будем кидать?", reply_markup=kb6)
+            return
+    if call.data in ["left", "center", "right"] and status == 11:
+        r = db.get_field("users", id, "random")
+        db.update_field("users", id, "status", 12)
+        if r == random.randint(1, 3):
+            await call.message.answer("Ты попал!")
+            d = 10 + random.randint(10, 17)
+            hp_goblin = db.get_field("users", id, "hp_goblin")
+            yron = hp_goblin - d
+            await call.message.answer(f"Вы снесли гоблину {d}хп")
+            db.update_field("users", id, "hp_goblin", yron)
+            await call.message.answer("Теперь твоя задача уклонится от атаки гоблина! Куда будем уклонятся?",
+                                      reply_markup=kb6)
+        hp_goblin = db.get_field("users", id, "hp_goblin")
+        if hp_goblin <= 0:
+            await call.message.answer(
+                "Гоблин был повержен! Ты получаешь +20 к силе, +30 к ловкости, +5 к удаче, +1000 к балансу, а так же ваши хп востоновлены!",
+                reply_markup=kb9)
+            power = db.get_field("users", id, "power")
+            lovkost = db.get_field("users", id, "lovkost")
+            yudacha = db.get_field("users", id, "yudacha")
+            money = db.get_field("users", id, "money")
+            hp = db.get_field("users", id, "hp")
+            power += 20
+            lovkost += 30
+            yudacha += 5
+            money += 1000
+            hp += 100
+            db.update_field("users", id, power, power)
+            db.update_field("users", id, lovkost, lovkost)
+            db.update_field("users", id, yudacha, yudacha)
+            db.update_field("users", id, money, money)
+            db.update_field("users", id, hp, hp)
+            return
+        else:
+            await call.message.answer("Ты промазал!")
+            await call.message.answer("Теперь твоя задача уклонится от атаки гоблина! Куда будем уклонятся?",
+                                      reply_markup=kb6)
+            return
+    if call.data in ["left", "centr", "right"] and status == 12:
+        r = db.get_field("users", id, "random")
+        db.update_field("users", id, "status", 13)
+        if r == random.randint(1, 3):
+            d = 10 + random.randint(10, 30)
+            hp = db.get_field("users", id, "hp")
+            await call.message.answer(f"Вы не уклонились от атаки гоблина! -{d}")
+            yron = hp - d
+            db.update_field("users", id, "hp", yron)
+            db.get_field("users", id, "hp")
+            await call.message.answer("Отлично! Твоя задача кидать в противника! Куда будем кидать?", reply_markup=kb6)
+        hp = db.get_field("users", id, "hp")
+        if hp <= 0:
+            await call.message.answer("Вы мертв! Вы можете возродится, но при возрождении все ваши ресурсы и навыки будут потеряны, или можете купить зелье излечения в магазине!", reply_markup=kb11)
+        else:
+            await call.message.answer("Вы уклонились от атаки гоблина!")
+            await call.message.answer("Отлично! Твоя задача кидать в противника! Куда будем кидать?", reply_markup=kb6)
+    if call.data in ["left", "center", "right"] and status == 13:
+        r = db.get_field("users", id, "random")
+        db.update_field("users", id, "status", 14)
+        if r == random.randint(1, 3):
+            await call.message.answer("Ты попал!")
+            d = 10 + random.randint(10, 17)
+            hp_goblin = db.get_field("users", id, "hp_goblin")
+            yron = hp_goblin - d
+            await call.message.answer(f"Вы снесли гоблину {d}хп")
+            db.update_field("users", id, "hp_goblin", yron)
+            await call.message.answer("Теперь твоя задача уклонится от атаки гоблина! Куда будем уклонятся?",
+                                      reply_markup=kb6)
+        hp_goblin = db.get_field("users", id, "hp_goblin")
+        if hp_goblin <= 0:
+            await call.message.answer(
+                "Гоблин был повержен! Ты получаешь +20 к силе, +30 к ловкости, +5 к удаче, +1000 к балансу, а так же ваши хп востоновлены!",
+                reply_markup=kb9)
+            power = db.get_field("users", id, "power")
+            lovkost = db.get_field("users", id, "lovkost")
+            yudacha = db.get_field("users", id, "yudacha")
+            money = db.get_field("users", id, "money")
+            hp = db.get_field("users", id, "hp")
+            power += 20
+            lovkost += 30
+            yudacha += 5
+            money += 1000
+            hp += 100
+            db.update_field("users", id, power, power)
+            db.update_field("users", id, lovkost, lovkost)
+            db.update_field("users", id, yudacha, yudacha)
+            db.update_field("users", id, money, money)
+            db.update_field("users", id, hp, hp)
+        else:
+            await call.message.answer("Ты промазал!")
+            await call.message.answer("Теперь твоя задача уклонится от атаки гоблина! Куда будем уклонятся?",
+                                      reply_markup=kb6)
+    if call.data in ["left", "centr", "right"] and status == 14:
+        r = db.get_field("users", id, "random")
+        db.update_field("users", id, "status", 15)
+        if r == random.randint(1, 3):
+            d = 10 + random.randint(10, 30)
+            hp = db.get_field("users", id, "hp")
+            await call.message.answer(f"Вы не уклонились от атаки гоблина! -{d}")
+            yron = hp - d
+            db.update_field("users", id, "hp", yron)
+            db.get_field("users", id, "hp")
+            await call.message.answer("Отлично! Твоя задача кидать в противника! Куда будем кидать?", reply_markup=kb6)
+        hp = db.get_field("users", id, "hp")
+        if hp <= 0:
+            await call.message.answer("Вы мертв! Вы можете возродится, но при возрождении все ваши ресурсы и навыки будут потеряны, или можете купить зелье излечения в магазине!", reply_markup=kb11)
+        else:
+            await call.message.answer("Вы уклонились от атаки гоблина!")
+            await call.message.answer("Отлично! Твоя задача кидать в противника! Куда будем кидать?", reply_markup=kb6)
+    if call.data in ["left", "center", "right"] and status == 15:
+        r = db.get_field("users", id, "random")
+        db.update_field("users", id, "status", 16)
+        if r == random.randint(1, 3):
+            await call.message.answer("Ты попал!")
+            d = 10 + random.randint(10, 17)
+            hp_goblin = db.get_field("users", id, "hp_goblin")
+            yron = hp_goblin - d
+            await call.message.answer(f"Вы снесли гоблину {d}хп")
+            db.update_field("users", id, "hp_goblin", yron)
+            await call.message.answer("Теперь твоя задача уклонится от атаки гоблина! Куда будем уклонятся?",
+                                      reply_markup=kb6)
+        hp_goblin = db.get_field("users", id, "hp_goblin")
+        if hp_goblin <= 0:
+            await call.message.answer(
+                "Гоблин был повержен! Ты получаешь +20 к силе, +30 к ловкости, +5 к удаче, +1000 к балансу, а так же ваши хп востоновлены!",
+                reply_markup=kb9)
+            power = db.get_field("users", id, "power")
+            lovkost = db.get_field("users", id, "lovkost")
+            yudacha = db.get_field("users", id, "yudacha")
+            money = db.get_field("users", id, "money")
+            hp = db.get_field("users", id, "hp")
+            power += 20
+            lovkost += 30
+            yudacha += 5
+            money += 1000
+            hp += 100
+            db.update_field("users", id, power, power)
+            db.update_field("users", id, lovkost, lovkost)
+            db.update_field("users", id, yudacha, yudacha)
+            db.update_field("users", id, money, money)
+            db.update_field("users", id, hp, hp)
+
+        else:
+            await call.message.answer("Ты промазал!")
+            await call.message.answer("Теперь твоя задача уклонится от атаки гоблина! Куда будем уклонятся?",
+                                      reply_markup=kb)
+    if call.data in ["left", "centr", "right"] and status == 16:
+        r = db.get_field("users", id, "random")
+        db.update_field("users", id, "status", 17)
+        if r == random.randint(1, 3):
+            d = 10 + random.randint(10, 30)
+            hp = db.get_field("users", id, "hp")
+            await call.message.answer(f"Вы не уклонились от атаки гоблина! -{d}")
+            yron = hp - d
+            db.update_field("users", id, "hp", yron)
+            db.get_field("users", id, "hp")
+            await call.message.answer("Отлично! Твоя задача кидать в противника! Куда будем кидать?", reply_markup=kb6)
+        hp = db.get_field("users", id, "hp")
+        if hp <= 0:
+            await call.message.answer("Вы мертв! Вы можете возродится, но при возрождении все ваши ресурсы и навыки будут потеряны, или можете купить зелье излечения в магазине!", reply_markup=kb11)
+        else:
+            await call.message.answer("Вы уклонились от атаки гоблина!")
+            await call.message.answer("Отлично! Твоя задача кидать в противника! Куда будем кидать?", reply_markup=kb6)
+    if call.data in ["left", "center", "right"] and status == 17:
+        r = db.get_field("users", id, "random")
+        db.update_field("users", id, "status", 18)
+        if r == random.randint(1, 3):
+            await call.message.answer("Ты попал!")
+            d = 10 + random.randint(10, 17)
+            hp_goblin = db.get_field("users", id, "hp_goblin")
+            yron = hp_goblin - d
+            await call.message.answer(f"Вы снесли гоблину {d}хп")
+            db.update_field("users", id, "hp_goblin", yron)
+            await call.message.answer("Теперь твоя задача уклонится от атаки гоблина! Куда будем уклонятся?",
+                                      reply_markup=kb6)
+        hp_goblin = db.get_field("users", id, "hp_goblin")
+        if hp_goblin <= 0:
+            await call.message.answer(
+                "Гоблин был повержен! Ты получаешь +20 к силе, +30 к ловкости, +5 к удаче, +1000 к балансу, а так же ваши хп востоновлены!",
+                reply_markup=kb9)
+            power = db.get_field("users", id, "power")
+            lovkost = db.get_field("users", id, "lovkost")
+            yudacha = db.get_field("users", id, "yudacha")
+            money = db.get_field("users", id, "money")
+            hp = db.get_field("users", id, "hp")
+            power += 20
+            lovkost += 30
+            yudacha += 5
+            money += 1000
+            hp += 100
+            db.update_field("users", id, power, power)
+            db.update_field("users", id, lovkost, lovkost)
+            db.update_field("users", id, yudacha, yudacha)
+            db.update_field("users", id, money, money)
+            db.update_field("users", id, hp, hp)
+
+        else:
+            await call.message.answer("Ты промазал!")
+            await call.message.answer("Теперь твоя задача уклонится от атаки гоблина! Куда будем уклонятся?",
+                                      reply_markup=kb)
+    if call.data in ["left", "centr", "right"] and status == 18:
+        r = db.get_field("users", id, "random")
+        db.update_field("users", id, "status", 17)
+        if r == random.randint(1, 3):
+            d = 10 + random.randint(10, 30)
+            hp = db.get_field("users", id, "hp")
+            await call.message.answer(f"Вы не уклонились от атаки гоблина! -{d}")
+            yron = hp - d
+            db.update_field("users", id, "hp", yron)
+            db.get_field("users", id, "hp")
+            await call.message.answer("Отлично! Твоя задача кидать в противника! Куда будем кидать?", reply_markup=kb6)
+        hp = db.get_field("users", id, "hp")
+        if hp <= 0:
+            await call.message.answer("Вы мертв! Вы можете возродится, но при возрождении все ваши ресурсы и навыки будут потеряны, или можете купить зелье излечения в магазине!", reply_markup=kb11)
+        else:
+            await call.message.answer("Вы уклонились от атаки гоблина!")
+            await call.message.answer("Отлично! Твоя задача кидать в противника! Куда будем кидать?", reply_markup=kb6)
+
+
 
 
 
@@ -363,12 +563,13 @@ async def start_call(call):
         yudacha = db.get_field("users", id, "yudacha")
         brona = db.get_field("users", id, "brona")
         money = db.get_field("users", id, "money")
-        await call.message.answer(f"Вот информация о тебе: \nИмя: {name}\nЗдоровье❤️: {hp}\nСила✊: {power}\nЛовкость🏃: {lovkost}\nУдача🤞: {yudacha}\nБроня🛡: {brona}\nБаланс💰: {money}")
+        await call.message.answer(f"Вот информация о тебе: \nИмя: {name}\nЗдоровье❤️: {hp}\nСила✊: {power}\n Ловкость🏃: {lovkost}\nУдача🤞: {yudacha}\nБроня🛡: {brona}\nБаланс💰: {money}")
     if call.data == "proka":
         await call.message.answer("Давай приступим", reply_markup=kb2)
     if call.data == "glavmenu":
         await call.message.answer("Главное меню", reply_markup=kb7)
-
+    if call.data =="vozr":
+       db.del_user(id)
 
 
 
