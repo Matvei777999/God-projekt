@@ -205,13 +205,11 @@ async def start_call(call):
             db.update_field("users", id, lovkost, lovkost)
             db.update_field("users", id, yudacha, yudacha)
             db.update_field("users", id, money, money)
-
-            return
         else:
             await call.message.answer("Ты промазал!")
             await call.message.answer("Теперь твоя задача уклонится от атаки гоблина! Куда будем уклонятся?",reply_markup=kb6)
             db.update_field("users", id, "status", 6)
-            return
+        return
     if call.data in ["left","center","right"] and status == 6:
         r = db.get_field("users", id, "random")
         db.update_field("users", id, "status", 7)
@@ -228,6 +226,7 @@ async def start_call(call):
         else:
             await call.message.answer("Вы уклонились от атаки гоблина!")
             await call.message.answer("Отлично! Твоя задача кидать в противника! Куда будем кидать?", reply_markup=kb6)
+        return
     if call.data in ["left", "center", "right"] and status == 7:
         r = db.get_field("users", id, "random")
         db.update_field("users", id, "status", 8)
@@ -260,6 +259,7 @@ async def start_call(call):
         else:
             await call.message.answer("Ты промазал!")
             await call.message.answer("Теперь твоя задача уклонится от атаки гоблина! Куда будем уклонятся?",reply_markup=kb6)
+        return
     if call.data in ["left", "centr", "right"] and status == 8:
         r = db.get_field("users", id, "random")
         db.update_field("users", id, "status", 9)
@@ -273,11 +273,10 @@ async def start_call(call):
         hp = db.get_field("users", id, "hp")
         if hp <= 0:
             await call.message.answer("Вы мертв! Вы можете возродится, но при возрождении все ваши ресурсы и навыки будут потеряны, или можете купить зелье излечения в магазине!", reply_markup=kb11)
-            return
         else:
             await call.message.answer("Вы уклонились от атаки гоблина!")
             await call.message.answer("Отлично! Твоя задача кидать в противника! Куда будем кидать?", reply_markup=kb6)
-            return
+        return
     if call.data in ["left", "center", "right"] and status == 9:
         r = db.get_field("users", id, "random")
         db.update_field("users", id, "status", 10)
@@ -310,12 +309,11 @@ async def start_call(call):
             db.update_field("users", id, yudacha, yudacha)
             db.update_field("users", id, money, money)
             db.update_field("users", id, hp, hp)
-            return
         else:
             await call.message.answer("Ты промазал!")
             await call.message.answer("Теперь твоя задача уклонится от атаки гоблина! Куда будем уклонятся?",
                                       reply_markup=kb6)
-            return
+        return
     if call.data in ["left", "centr", "right"] and status == 10:
         r = db.get_field("users", id, "random")
         db.update_field("users", id, "status", 11)
@@ -329,11 +327,10 @@ async def start_call(call):
         hp = db.get_field("users", id, "hp")
         if hp <= 0:
             await call.message.answer("Вы мертв! Вы можете возродится, но при возрождении все ваши ресурсы и навыки будут потеряны, или можете купить зелье излечения в магазине!", reply_markup=kb11)
-            return
         else:
             await call.message.answer("Вы уклонились от атаки гоблина!")
             await call.message.answer("Отлично! Твоя задача кидать в противника! Куда будем кидать?", reply_markup=kb6)
-            return
+        return
     if call.data in ["left", "center", "right"] and status == 11:
         r = db.get_field("users", id, "random")
         db.update_field("users", id, "status", 12)
@@ -366,12 +363,11 @@ async def start_call(call):
             db.update_field("users", id, yudacha, yudacha)
             db.update_field("users", id, money, money)
             db.update_field("users", id, hp, hp)
-            return
         else:
             await call.message.answer("Ты промазал!")
             await call.message.answer("Теперь твоя задача уклонится от атаки гоблина! Куда будем уклонятся?",
                                       reply_markup=kb6)
-            return
+        return
     if call.data in ["left", "centr", "right"] and status == 12:
         r = db.get_field("users", id, "random")
         db.update_field("users", id, "status", 13)
@@ -389,6 +385,7 @@ async def start_call(call):
         else:
             await call.message.answer("Вы уклонились от атаки гоблина!")
             await call.message.answer("Отлично! Твоя задача кидать в противника! Куда будем кидать?", reply_markup=kb6)
+        return
     if call.data in ["left", "center", "right"] and status == 13:
         r = db.get_field("users", id, "random")
         db.update_field("users", id, "status", 14)
@@ -425,6 +422,7 @@ async def start_call(call):
             await call.message.answer("Ты промазал!")
             await call.message.answer("Теперь твоя задача уклонится от атаки гоблина! Куда будем уклонятся?",
                                       reply_markup=kb6)
+        return
     if call.data in ["left", "centr", "right"] and status == 14:
         r = db.get_field("users", id, "random")
         db.update_field("users", id, "status", 15)
@@ -442,6 +440,7 @@ async def start_call(call):
         else:
             await call.message.answer("Вы уклонились от атаки гоблина!")
             await call.message.answer("Отлично! Твоя задача кидать в противника! Куда будем кидать?", reply_markup=kb6)
+        return
     if call.data in ["left", "center", "right"] and status == 15:
         r = db.get_field("users", id, "random")
         db.update_field("users", id, "status", 16)
@@ -479,6 +478,7 @@ async def start_call(call):
             await call.message.answer("Ты промазал!")
             await call.message.answer("Теперь твоя задача уклонится от атаки гоблина! Куда будем уклонятся?",
                                       reply_markup=kb)
+        return
     if call.data in ["left", "centr", "right"] and status == 16:
         r = db.get_field("users", id, "random")
         db.update_field("users", id, "status", 17)
@@ -496,6 +496,7 @@ async def start_call(call):
         else:
             await call.message.answer("Вы уклонились от атаки гоблина!")
             await call.message.answer("Отлично! Твоя задача кидать в противника! Куда будем кидать?", reply_markup=kb6)
+        return
     if call.data in ["left", "center", "right"] and status == 17:
         r = db.get_field("users", id, "random")
         db.update_field("users", id, "status", 18)
@@ -533,6 +534,7 @@ async def start_call(call):
             await call.message.answer("Ты промазал!")
             await call.message.answer("Теперь твоя задача уклонится от атаки гоблина! Куда будем уклонятся?",
                                       reply_markup=kb)
+        return
     if call.data in ["left", "centr", "right"] and status == 18:
         r = db.get_field("users", id, "random")
         db.update_field("users", id, "status", 17)
